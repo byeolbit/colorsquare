@@ -38,20 +38,6 @@ function clientClass(ID){
     this.ping = true;
 }
 
-function getAddr(addr){
-    console.log(addr.address+':'+addr.port);
-    return addr.address+':'+addr.port;
-}
-
-function checkIP(ip){
-    for(var i=0; i<clients.length; i++){
-        if(clients[i].address == ip){
-            return true;
-        }
-    }
-    return false;
-}
-
 function team(teamNum, teamName, teamColor, teamMembers){
     this.num = teamNum;
     this.name = teamName;
@@ -249,19 +235,6 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
 
-    //var addr = socket.request.connection.remoteAddress;
-    /*    var ip = socket.request.headers['x-forwarded-for'] ||
-     socket.req.connection.remoteAddress ||
-     socket.req.socket.remoteAddress ||
-     socket.req.connection.socket.remoteAddress;
-     console.log(ip);*/
-    /*
-     if(checkIP(addr)){
-     io.sockets.connected[socket.id].emit('wrong connectoin');
-     socket.disconnect();
-     return false;
-     }
-     */
     clients.push(new clientClass(socket.id));
 
     userCount++;
@@ -269,12 +242,6 @@ io.on('connection', function(socket){
     io.sockets.connected[socket.id].emit('new user', clients[userCount-1].nick);
     io.emit('online users',userCount);
     sortScoreBoard();
-
-    /*
-     socket.on('use', function(rID){
-     console.log('recieved : '+rID);
-     });
-     */
 
     socket.on('request init', function(){
         io.sockets.connected[socket.id].emit('load colors', colorList, stacks);
