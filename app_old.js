@@ -8,13 +8,9 @@ var http = require('http').Server(app);
 var io = require('socketio')(http);
 var assert = require('assert');
 
-app.use(express.static('script'));
-app.use(express.static('css'));
-
 var teamList = [];
 var cellInfo = [];
 var colorList = [];
-var userLists = [];
 var teamCount = 0;
 var clients = [];
 var userCount = 0;
@@ -174,7 +170,7 @@ for (var i=1; i<1601; i++){
     colorList[i] = "#AAAAAA";
     stacks[i] = 0;
 }
-var pointTimer = setInterval(addPoint, 10000);
+//var pointTimer = setInterval(addPoint, 10000);
 
 function newNick(){
     return 'user#'+(Math.random() + 1).toString(36).substr(6);
@@ -189,32 +185,32 @@ function compare(a,b) {
         return 0;
 }
 
-function findTeambyID(userid) {
+function findTeambyID(paramUserId) {
     for (var i=0; i<clients.length; i++){
-        if(clients[i].id == userid){
+        if(clients[i].id == paramUserId){
             return clients[i].team;
         }
     }
 }
 
-function findClientIndex(userid){
+function findClientIndex(paramUserId){
     for (var i=0; i<clients.length; i++){
-        if(clients[i].id == userid){
+        if(clients[i].id == paramUserId){
             return i;
         }
     }
 }
 
-function joinTeam(sckt,teamname){
-    var t = teamList[findByName(teamname)];
-    t.members++;
-    t.member.push(sckt.id);
-    clients[findClientIndex(sckt.id)].team = t.num;
-    clients[findClientIndex(sckt.id)].tname = t.name;
-    io.sockets.connected[sckt.id].emit('joined',t.name,t.color,t.num);
-    io.sockets.connected[sckt.id].emit('team score',t.score);
-    sckt.join(t.name);
-    io.to(teamname).emit('team memeber changed', t.members);
+function joinTeam(paramSocket,paramTeamName){
+    var targetTeam = teamList[findByName(paramTeamName)];
+    targetTeam.members++;
+    targetTeam.member.push(paramSocket.id);
+    clients[findClientIndex(paramSocket.id)].team = targetTeam.num;
+    clients[findClientIndex(paramSocket.id)].tname = targetTeam.name;
+    io.sockets.connected[paramSocket.id].emit('joined',targetTeam.name,targetTeam.color,targetTeam.num);
+    io.sockets.connected[paramSocket.id].emit('team score',targetTeam.score);
+    paramSocket.join(targetTeam.name);
+    io.to(paramTeamName).emit('team memeber changed', targetTeam.members);
 }
 
 function sortScoreBoard(){
@@ -252,10 +248,8 @@ io.on('connection', function(socket){
     socket.on('change cell', function(className){
         var clt = clients[findClientIndex(socket.id)];
         var newColor = teamList[findTeamIndex(clt.team)].color;
-        var teamName = teamList[findTeamIndex(clt.team)].name;
         var teamNum = teamList[findTeamIndex(clt.team)].num;
         var cellNum = className.substr(5)*1;
-        var stackChangedCell = [];
         var updown = []; //1 is stack pushed, 0 is no change, -1 is stack poped
 
         for(var i=0; i<5; i++){
@@ -456,25 +450,23 @@ io.on('connection', function(socket){
 
     });
 
-    socket.on('gen team', function(tN, tC){
+    socket.on('gen team', function(paramTeamNumber, paramTeamColor){
         var isGen = false;
         var teamNum;
-        if(checkTeamName(tN)){
+        if(checkTeamName(paramTeamNumber)){
             teamCount++;
             teamNum = teamCount;
-            teamList.push(new team(teamNum, tN, tC, 1));
+            teamList.push(new team(teamNum, paramTeamNumber, paramTeamColor, 1));
             isGen = true;
-            joinTeam(socket,tN)
-
+            joinTeam(socket,paramTeamNumber);
         }
-        console.log(tN + ' generated')
+        console.log(paramTeamNumber + ' generated');
         io.sockets.connected[socket.id].emit('gen result',isGen);
-
     });
 
 
-    socket.on('join team', function(teamname){
-        joinTeam(socket,teamname);
+    socket.on('join team', function(teamName){
+        joinTeam(socket,teamName);
         io.sockets.connected[socket.id].emit('global msg', 'Welcome to C0L0R SQ@RE. If you have bug report or opinion please send me an email : info@byeolbit.com  Have a good time!', 'System');
     });
 
@@ -482,44 +474,44 @@ io.on('connection', function(socket){
         if (msg==''){
             return false;
         }
-        var c = clients[findClientIndex(socket.id)];
-        msg = c.nick + ':' + msg;
-        io.to(c.tname).emit('team msg', msg, c.nick);
+        var targetClient = clients[findClientIndex(socket.id)];
+        msg = targetClient.nick + ':' + msg;
+        io.to(targetClient.tname).emit('team msg', msg, targetClient.nick);
     });
 
     socket.on('send global msg', function(msg){
         if (msg==''){
             return false;
         }
-        var c = clients[findClientIndex(socket.id)];
-        msg = c.nick + ':' + msg;
-        io.emit('global msg', msg, c.nick);
+        var targetClient = clients[findClientIndex(socket.id)];
+        msg = targetClient.nick + ':' + msg;
+        io.emit('global msg', msg, targetClient.nick);
 
     });
 
-    socket.on('request ping', function(e){
-        var clnt = clients[findClientIndex(socket.id)];
-        var ping = clnt.ping;
-        if(clnt.ping == true){
-            setPing(clnt.id);
-            var x = e.pageX;
-            var y = e.pageY;
-            var cooridm = +x+'m'+y;
-            var cooridp = +x+'p'+y;
+    socket.on('request ping', function(paramEvent){
+        var targetClient = clients[findClientIndex(socket.id)];
+        var ping = targetClient.ping;
+        if(targetClient.ping == true){
+            setPing(targetClient.id);
+            var x = paramEvent.pageX;
+            var y = paramEvent.pageY;
+            var coordinateMessageId = +x+'m'+y;
+            var coordinateMessagePing = +x+'p'+y;
             var str = 'Support request on x:'+x+' / y:'+y;
             var fun = '<a href="#" onclick="scrollScreen(event,'+x+','+y+');return false;">'+str+'</a>';
-            io.to(clnt.tname).emit('ping msg', fun);
-            io.to(clnt.tname).emit('send ping',cooridp, cooridm, x, y);
+            io.to(targetClient.tname).emit('ping msg', fun);
+            io.to(targetClient.tname).emit('send ping',coordinateMessagePing, coordinateMessageId, x, y);
         }
     });
 
     socket.on('disconnect', function(){
         console.log(socket.id + 'user disconnected');
         if(clients[findClientIndex(socket.id)].team != null){
-            var t = teamList[findTeamIndex(findTeambyID(socket.id))];
-            t.member.splice(t.member.indexOf(socket.id),1);
-            t.members--;
-            io.to(t.name).emit('team memeber changed', t.members);
+            var targetTeam = teamList[findTeamIndex(findTeambyID(socket.id))];
+            targetTeam.member.splice(targetTeam.member.indexOf(socket.id),1);
+            targetTeam.members--;
+            io.to(targetTeam.name).emit('team memeber changed', targetTeam.members);
         }
         clients.splice(findClientIndex(socket.id),1);
         userCount--;
