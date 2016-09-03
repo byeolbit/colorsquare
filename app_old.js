@@ -22,14 +22,14 @@ var usedColor = [];
 var stacks = [];
 var scoreList = [];
 
-function celldata(c, s, t){
+function cellData(c, s, t){
     this.color = c;
     this.stack = s;
     this.team = t;
     this.isCompleted = false;
 }
 
-function client_class(ID){
+function clientClass(ID){
     this.id = ID;
     this.team = null;
     this.tname = null;
@@ -184,7 +184,7 @@ function stackEffect(cellNum, refColor){
     }
 }
 for (var i=1; i<1601; i++){
-    cellInfo[i] = new celldata("#AAAAAA",0,null);
+    cellInfo[i] = new cellData("#AAAAAA",0,null);
     colorList[i] = "#AAAAAA";
     stacks[i] = 0;
 }
@@ -262,7 +262,7 @@ io.on('connection', function(socket){
      return false;
      }
      */
-    clients.push(new client_class(socket.id));
+    clients.push(new clientClass(socket.id));
 
     userCount++;
     console.log(userCount+clients[userCount-1].id);
