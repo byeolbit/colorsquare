@@ -1,4 +1,4 @@
-# C0L0R $Q@RE
+# C0L0R SQ@RE
 Node.js web game
 
 ## App 소개
