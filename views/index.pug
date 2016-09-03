@@ -10,29 +10,77 @@ html
         script(src='/socket.io/socket.io.js')
         script(src='/script.js')
     body(onselectstart='return false', ondragstart='return false')
-        #howto1.overlay
-        #popup1.overlay
-        .userInfo
+        div#howto1.overlay
+            div.howto
+                div.contentswrap
+                    center
+                        h1 how to play
+                    ol
+                        li Grey-colored squares are neutral.
+                        li You can change squares into your team color with points.
+                            ul
+                                li You can invest your points to your team square to make it strong.
+                                li You can invest your points to other team square to conquer it.
+                        li need 2points to attack the completed cell
+        div#popup1.overlay
+            div.popup
+                div.contentswrap
+                    div.h1 Join to C0L0R SQU@RE
+                    div.h2 Select your team
+                    div.team_select
+                        div.contents
+                            label(for="teamlists")
+                        div.contents
+                            button join!
+                    div.h2 Or.. make your team
+                    div.make_team
+                        div.contents
+                            div.title Team name :
+                            input(type="text", id="new_team_name" ,placeholder="1~23 latters")
+                        div.contents
+                            div.title Team color :
+                            div.colorbox
+                            div.title
+                                button#refresh Refresh color
+                        div.contents
+                            button#genteam Generate Team
+        div.userInfo
             h4 version beta 0.1
             p users online :
-        .infoLayer
+        div.infoLayer
             h2 Your team
-            .currentTeam
+            div.currentTeam
             h2 Team color
-            .currentColor
+            div.currentColor
             h2 Points
-            .currentPoint
+            div.currentPoint
             h2 Team score
-            #score.currentTeamScore
+            div#score.currentTeamScore
             h2 Number of Members
-            #mN.currentTeamMembers
+            div#mN.currentTeamMembers
             h2 Top 20 Teams
-            .scoreBoard
+            div.scoreBoard
             ol#slist
-        .chatWrap
-            .globalchat
-            .teamchat
-        .cellField
-        .rightMargin
-        .bottomMargin
-        .pingInfo
+        div.chatWrap
+            div.globalchat
+                div.chat
+                    div.title Global chat
+                    ul#cg.conv
+                    div.form
+                        input#g
+                        button#gs send
+
+            div.teamchat
+                div.chat
+                    div.title Team chat
+                    ul#ct.conv
+                    div.form
+                        input#t
+                        button#ts send
+
+
+        div.cellField
+        div.rightMargin
+        div.bottomMargin
+        div.pingInfo
+            p Ping : ready
