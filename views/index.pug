@@ -1,0 +1,38 @@
+doctype html
+html
+    head
+        title C0L0R SQU@RE
+        link(href='/jquery-ui-1.11.4/jquery-ui.css', rel='stylesheet')
+        link(href='stylesheet.css', rel='stylesheet')
+        script(src='http://code.jquery.com/jquery-2.2.1.min.js')
+        script(src='/jquery-ui-1.11.4/external/jquery/jquery.js')
+        script(src='/jquery-ui-1.11.4/jquery-ui.js')
+        script(src='/socket.io/socket.io.js')
+        script(src='/script.js')
+    body(onselectstart='return false', ondragstart='return false')
+        #howto1.overlay
+        #popup1.overlay
+        .userInfo
+            h4 version beta 0.1
+            p users online :
+        .infoLayer
+            h2 Your team
+            .currentTeam
+            h2 Team color
+            .currentColor
+            h2 Points
+            .currentPoint
+            h2 Team score
+            #score.currentTeamScore
+            h2 Number of Members
+            #mN.currentTeamMembers
+            h2 Top 20 Teams
+            .scoreBoard
+            ol#slist
+        .chatWrap
+            .globalchat
+            .teamchat
+        .cellField
+        .rightMargin
+        .bottomMargin
+        .pingInfo
